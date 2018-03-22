@@ -26,9 +26,10 @@ local function logmsg(logTbl)
     local cluster = os.getenv("VSC_INSTITUTE_CLUSTER") or ""
     local jobid = os.getenv("PBS_JOBID") or ""
     local user = os.getenv("USER")
+    local arch = os.getenv("VSC_ARCH_LOCAL") or ""
 
-    local msg = string.format("username=%s, cluster=%s, jobid=%s",
-                              user, cluster, jobid)
+    local msg = string.format("username=%s, cluster=%s, arch=%s, jobid=%s",
+                              user, cluster, arch, jobid)
 
     for _, val in ipairs(logTbl) do
         msg = msg .. string.format(", %s=%s", val[1], val[2] or "")
