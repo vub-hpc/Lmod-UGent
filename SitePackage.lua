@@ -62,6 +62,8 @@ local function load_hook(t)
     logTbl[#logTbl+1] = {"module", t.modFullName}
     logTbl[#logTbl+1] = {"fn", t.fn}
 
+    logmsg(logTbl)
+
     -- warn users about old modules (only directly loaded ones)
     if os.getenv("VSC_OS_LOCAL") == "CO7" and frameStk:atTop() then
         local arch, toolchainver
