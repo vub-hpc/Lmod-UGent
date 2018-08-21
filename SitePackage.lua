@@ -35,7 +35,10 @@ local function logmsg(logTbl)
         msg = msg .. string.format(", %s=%s", val[1], val[2] or "")
     end
 
-    lmod_system_execute("/bin/logger -t lmod -p user.notice -- " .. msg)
+    -- Don't log any modules load by the monitoring
+    if user ~= "zabbix" then
+        lmod_system_execute("/bin/logger -t lmod -p user.notice -- " .. msg)
+    end
 end
 
 
@@ -58,11 +61,6 @@ local function load_hook(t)
     logTbl[#logTbl+1] = {"userload", userload}
     logTbl[#logTbl+1] = {"module", t.modFullName}
     logTbl[#logTbl+1] = {"fn", t.fn}
-
-    -- Don't log any modules load by the monitoring
-    if os.getenv("USER") ~= "zabbix" then
-        logmsg(logTbl)
-    end
 
     -- warn users about old modules (only directly loaded ones)
     if os.getenv("VSC_OS_LOCAL") == "CO7" and frameStk:atTop() then
