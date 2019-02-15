@@ -13,7 +13,6 @@ require("parseVersion")
 local Dbg   = require("Dbg")
 local dbg   = Dbg:dbg()
 local hook  = require("Hook")
-local posix = require("posix")
 local FrameStk  = require("FrameStk")
 
 
