@@ -13,7 +13,6 @@ require("parseVersion")
 local Dbg   = require("Dbg")
 local dbg   = Dbg:dbg()
 local hook  = require("Hook")
-local posix = require("posix")
 local FrameStk  = require("FrameStk")
 
 
@@ -66,8 +65,8 @@ local function load_hook(t)
 
     -- warn users about old modules (only directly loaded ones)
     if os.getenv("VSC_OS_LOCAL") == "CO7" and frameStk:atTop() then
-        local arch, toolchainver
-        arch, toolchainver = t.fn:match("^/apps/brussel/CO7/(.+)/modules/(20[12][0-9][ab])/all/")
+        local _, toolchainver
+        _, toolchainver = t.fn:match("^/apps/brussel/CO7/(.+)/modules/(20[12][0-9][ab])/all/")
 
         if toolchainver == nil then return end
 
