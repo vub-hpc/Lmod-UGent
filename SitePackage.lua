@@ -13,7 +13,6 @@ require("parseVersion")
 local Dbg   = require("Dbg")
 local dbg   = Dbg:dbg()
 local hook  = require("Hook")
-local posix = require("posix")
 local FrameStk  = require("FrameStk")
 
 
@@ -26,15 +25,19 @@ local function logmsg(logTbl)
     local cluster = os.getenv("VSC_INSTITUTE_CLUSTER") or ""
     local jobid = os.getenv("PBS_JOBID") or ""
     local user = os.getenv("USER")
+    local arch = os.getenv("VSC_ARCH_LOCAL") or ""
 
-    local msg = string.format("username=%s, cluster=%s, jobid=%s",
-                              user, cluster, jobid)
+    local msg = string.format("username=%s, cluster=%s, arch=%s, jobid=%s",
+                              user, cluster, arch, jobid)
 
     for _, val in ipairs(logTbl) do
         msg = msg .. string.format(", %s=%s", val[1], val[2] or "")
     end
 
-    lmod_system_execute("/bin/logger -t lmod -p user.notice -- " .. msg)
+    -- Don't log any modules load by the monitoring
+    if user ~= "zabbix" then
+        lmod_system_execute("/bin/logger -t lmod -p user.notice -- " .. msg)
+    end
 end
 
 
@@ -58,15 +61,12 @@ local function load_hook(t)
     logTbl[#logTbl+1] = {"module", t.modFullName}
     logTbl[#logTbl+1] = {"fn", t.fn}
 
-    -- Don't log any modules load by the monitoring
-    if os.getenv("USER") ~= "zabbix" then
-        logmsg(logTbl)
-    end
+    logmsg(logTbl)
 
     -- warn users about old modules (only directly loaded ones)
     if os.getenv("VSC_OS_LOCAL") == "CO7" and frameStk:atTop() then
-        local arch, toolchainver
-        arch, toolchainver = t.fn:match("^/apps/brussel/CO7/(.+)/modules/(20[12][0-9][ab])/all/")
+        local _, toolchainver
+        _, toolchainver = t.fn:match("^/apps/brussel/CO7/(.+)/modules/(20[12][0-9][ab])/all/")
 
         if toolchainver == nil then return end
 
@@ -166,7 +166,8 @@ local function errwarnmsg_hook(kind, key, msg, t)
         local errmsg = {"A different version of the '"..sname.."' module is already loaded (see output of 'ml')."}
         if not frameStk:empty() then
             local framesn = frameStk:sn()
-            errmsg[#errmsg+1] = "You should load another '"..framesn.."' module for that is compatible with the currently loaded version of '"..sname.."'."
+            errmsg[#errmsg+1] = [[You should load another '"..framesn.."' module for that is compatible with
+the currently loaded version of '"..sname.."'."]]
             errmsg[#errmsg+1] = "Use 'ml spider "..framesn.."' to get an overview of the available versions."
         end
         errmsg[#errmsg+1] = "\n"
