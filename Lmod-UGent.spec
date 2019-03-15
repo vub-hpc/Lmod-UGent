@@ -1,7 +1,7 @@
 %global macrosdir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 
 Name:           Lmod
-Version:        7.8.6
+Version:        7.8.22
 Release:        1.br%{?dist}
 Summary:        Environmental Modules System in Lua
 
@@ -45,7 +45,7 @@ where the library and header files can be found.
 sed -i -e 's,/usr/bin/env ,/usr/bin/,' src/*.tcl
 # Remove bundled lua-term
 rm -r pkgs tools/json.lua
-#sed -i -e 's, pkgs , ,' Makefile.in
+sed -i -e 's/^spiderCacheSupport: lfs/spiderCacheSupport: /' Makefile.in
 # Remove unneeded shbangs
 sed -i -e '/^#!/d' init/*.in
 
@@ -93,6 +93,10 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Fri Mar 15 2019 Ward Poelmans <ward.poelmans@vub.be> - 7.8.22-1.bu
+- update to Lmod 7.8.22
+- sync up with UGent spec file
+
 * Wed Mar 7 2018 Ward Poelmans <ward.poelmans@vub.be> - 7.7.18-1.bu
 - update to Lmod 7.7.18
 - Adjust to VUB flavour of Lmod (our own special sauce)
