@@ -1,7 +1,7 @@
 %global macrosdir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 
 Name:           Lmod
-Version:        7.8.22
+Version:        8.1.7
 Release:        1.br%{?dist}
 Summary:        Environmental Modules System in Lua
 
@@ -44,14 +44,14 @@ where the library and header files can be found.
 %patch0 -p1
 sed -i -e 's,/usr/bin/env ,/usr/bin/,' src/*.tcl
 # Remove bundled lua-term
-rm -r pkgs tools/json.lua
+rm -r pkgs/luafilesystem/ pkgs/term/ tools/json.lua
 sed -i -e 's/^spiderCacheSupport: lfs/spiderCacheSupport: /' Makefile.in
 # Remove unneeded shbangs
 sed -i -e '/^#!/d' init/*.in
 
 
 %build
-%configure --prefix=%{_datadir} PS=/bin/ps --with-caseIndependentSorting=yes --with-redirect=yes --with-autoSwap=no --with-disableNameAutoSwap=yes --with-shortTime=86400 --with-pinVersions=yes --with-cachedLoads=no --with-siteName=HPC-SISC --with-syshost=Hydra --with-siteMsgFile=%{_datadir}/lmod/etc/lang.lua
+%configure --prefix=%{_datadir} PS=/bin/ps --with-caseIndependentSorting=yes --with-redirect=yes --with-autoSwap=no --with-disableNameAutoSwap=yes --with-shortTime=86400 --with-pinVersions=yes --with-cachedLoads=no --with-siteName=HPC-SISC --with-syshost=Hydra --with-siteMsgFile=%{_datadir}/lmod/etc/lang.lua --with-fastTCLInterp=no --with-extendedDefault=no
 make %{?_smp_mflags}
 
 
@@ -93,6 +93,11 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Wed May 22 2019 Ward Poelmans <ward.poelmans@vub.be> - 8.1.5-1.bu
+- Update to Lmod 8.1
+- Disable extended default for now
+- Disable binary tcl to lua interpreter (needs tcl-devel and lua-devel)
+
 * Fri Mar 15 2019 Ward Poelmans <ward.poelmans@vub.be> - 7.8.22-1.bu
 - update to Lmod 7.8.22
 - sync up with UGent spec file
