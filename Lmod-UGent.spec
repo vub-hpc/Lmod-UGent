@@ -51,7 +51,10 @@ sed -i -e '/^#!/d' init/*.in
 
 
 %build
-%configure --prefix=%{_datadir} PS=/bin/ps --with-caseIndependentSorting=yes --with-redirect=yes --with-autoSwap=no --with-disableNameAutoSwap=yes --with-shortTime=86400 --with-pinVersions=yes --with-cachedLoads=no --with-siteName=HPC-SISC --with-syshost=Hydra --with-siteMsgFile=%{_datadir}/lmod/etc/lang.lua --with-fastTCLInterp=no --with-extendedDefault=no
+%configure --prefix=%{_datadir} PS=/bin/ps --with-caseIndependentSorting=yes --with-redirect=yes --with-autoSwap=no \
+--with-disableNameAutoSwap=yes --with-shortTime=86400 --with-pinVersions=yes --with-cachedLoads=no \
+--with-siteName=HPC-SISC --with-syshost=Hydra --with-siteMsgFile=%{_datadir}/lmod/etc/lang.lua \
+--with-fastTCLInterp=no --with-extendedDefault=no
 make %{?_smp_mflags}
 
 
