@@ -96,6 +96,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Thu Jul 4 2019 Ward Poelmans <ward.poelmans@vub.be> - 8.1.7-2.br
+- Fix cache script to work in Brussel
+
 * Wed May 22 2019 Ward Poelmans <ward.poelmans@vub.be> - 8.1.5-1.bu
 - Update to Lmod 8.1
 - Disable extended default for now
