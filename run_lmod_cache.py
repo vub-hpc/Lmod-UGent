@@ -14,15 +14,14 @@
 This script runs the Lmod cache creation script and reports to nagios/icinga the exit status.
 It also can check if the age of the current age and will report if it's too old.
 
-@author: Ward Poelmans (Ghent University)
+@author: Ward Poelmans (Vrije Universiteit Brussel)
 """
+import glob
 import json
 import os
-import sys
 import time
 from vsc.utils import fancylogger
-from vsc.utils.nagios import NAGIOS_EXIT_CRITICAL, NAGIOS_EXIT_WARNING
-from vsc.utils.run import run_simple
+from vsc.utils.run import run as run_simple
 from vsc.utils.script_tools import ExtendedSimpleOption
 
 # log setup
@@ -32,14 +31,56 @@ fancylogger.setLogLevelInfo()
 
 NAGIOS_CHECK_INTERVAL_THRESHOLD = 2 * 60 * 60  # 2 hours
 
-def run_cache_create(modules_root):
+MODULES_BASEDIR = '/apps/brussel/CO7'
+
+
+def run_cache_create(archs=None):
     """Run the script to create the Lmod cache"""
     lmod_dir = os.environ.get("LMOD_DIR", None)
     if not lmod_dir:
         raise RuntimeError("Cannot find $LMOD_DIR in the environment.")
 
-    cmd = "%s/update_lmod_system_cache_files %s" % (lmod_dir, modules_root)
-    return run_simple(cmd)
+    if not archs:
+        archs = os.listdir(MODULES_BASEDIR)
+
+    for arch in archs:
+        modpath = os.path.join(MODULES_BASEDIR, arch, "modules")
+        if not os.path.isdir(modpath):
+            continue
+        logger.debug("Creating cache for %s", arch)
+        modsubpathglob = os.path.join(modpath, "20[0-9][0-9][ab]", "all")
+        modsubpaths = os.pathsep.join(sorted(glob.glob(modsubpathglob)))
+
+        cachedir = os.path.join(MODULES_BASEDIR, arch, "cacheDir")
+        systemfile = os.path.join(cachedir, "system.txt")
+
+        cmd = "%s/update_lmod_system_cache_files -d %s -t %s %s" % (lmod_dir, cachedir, systemfile, modsubpaths)
+        exitcode, msg = run_simple(cmd)
+        if exitcode != 0:
+            return exitcode, msg
+
+    return 0, ''
+
+
+def find_oldest_cache(archs=None):
+    """Find the oldest Lmod cache"""
+    if not archs:
+        archs = os.listdir(MODULES_BASEDIR)
+
+    oldest = time.time()
+
+    for arch in archs:
+        systemfile = os.path.join(MODULES_BASEDIR, arch, "cacheDir", "system.txt")
+        if not os.path.isfile(systemfile):
+            continue
+        timestamp = os.stat(systemfile)
+
+        if timestamp.st_mtime < oldest:
+            oldest = timestamp.st_mtime
+
+    logger.debug("Oldest cache is %s", oldest)
+
+    return oldest
 
 
 def get_lmod_config():
@@ -75,40 +116,36 @@ def main():
     options = {
         'nagios-check-interval-threshold': NAGIOS_CHECK_INTERVAL_THRESHOLD,
         'create-cache': ('Create the Lmod cache', None, 'store_true', False),
+        'architecture': ('Specify the architecture to create the cache for. Default: all architectures',
+                         'strlist', 'add', None),
         'freshness-threshold': ('The interval in minutes for how long we consider the cache to be fresh',
                                 'int', 'store', 120),
     }
     opts = ExtendedSimpleOption(options)
 
     try:
-        config = get_lmod_config()
-
         if opts.options.create_cache:
             opts.log.info("Updating the Lmod cache")
-            exitcode, msg = run_cache_create(config['modules_root'])
+            exitcode, msg = run_cache_create(archs=opts.options.architecture)
             if exitcode != 0:
                 logger.error("Lmod cache update failed: %s", msg)
                 opts.critical("Lmod cache update failed")
-                sys.exit(NAGIOS_EXIT_CRITICAL)
 
         opts.log.info("Checking the Lmod cache freshness")
-        timestamp = os.stat(config['cache_timestamp'])
+        timestamp = find_oldest_cache(archs=opts.options.architecture)
 
         # give a warning when the cache is older then --freshness-threshold
-        if (time.time() - timestamp.st_mtime) > opts.options.freshness_threshold * 60:
+        if (time.time() - timestamp) > opts.options.freshness_threshold * 60:
             errmsg = "Lmod cache is not fresh"
             logger.warn(errmsg)
             opts.warning(errmsg)
-            sys.exit(NAGIOS_EXIT_WARNING)
 
     except RuntimeError as err:
         logger.exception("Failed to update Lmod cache: %s", err)
         opts.critical("Failed to update Lmod cache. See logs.")
-        sys.exit(NAGIOS_EXIT_CRITICAL)
     except Exception as err:  # pylint: disable=W0703
         logger.exception("critical exception caught: %s", err)
         opts.critical("Script failed because of uncaught exception. See logs.")
-        sys.exit(NAGIOS_EXIT_CRITICAL)
 
     if opts.options.create_cache:
         opts.epilogue("Lmod cache updated.")
