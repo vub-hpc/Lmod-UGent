@@ -1,8 +1,8 @@
 %global macrosdir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 
 Name:           Lmod
-Version:        8.1.7
-Release:        2.br%{?dist}
+Version:        8.1.13
+Release:        1.br%{?dist}
 Summary:        Environmental Modules System in Lua
 
 # Lmod-5.3.2/tools/base64.lua is LGPLv2
@@ -96,6 +96,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Thu Aug 08 2019 Ward Poelmans <ward.poelmans@vub.be>
+- Switch to upstream 8.1.13
+
 * Thu Jul 4 2019 Ward Poelmans <ward.poelmans@vub.be> - 8.1.7-2.br
 - Fix cache script to work in Brussel
 
