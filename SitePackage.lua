@@ -200,7 +200,7 @@ end
 local function site_name_hook()
     -- set the SiteName, it must be a valid
     -- shell variable name.
-    return "HPC-SISC"
+    return "HPC_SISC"
 end
 
 
