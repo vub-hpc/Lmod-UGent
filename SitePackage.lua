@@ -41,6 +41,21 @@ local function logmsg(logTbl)
 end
 
 
+local function old_module_check(modT)
+    -- Check if a module is 'old'
+    -- modT should have a entry 'fn' with the module path
+    -- returns true/false
+
+    local tcver = modT.fn:match("^/apps/brussel/.*/modules/(20[0-9][0-9][ab])/all/")
+    if tcver == nil then return end
+
+    -- always the the a version of two years ago
+    local cutoff = string.format("%da", os.date("%Y") - 2)
+
+    return parseVersion(tcver) < parseVersion(cutoff)
+end
+
+
 local function load_hook(t)
     -- Called every time a module is loaded
     -- the arg t is a table:
@@ -64,15 +79,8 @@ local function load_hook(t)
     logmsg(logTbl)
 
     -- warn users about old modules (only directly loaded ones)
-    if os.getenv("VSC_OS_LOCAL") == "CO7" and frameStk:atTop() then
-        local _, toolchainver
-        _, toolchainver = t.fn:match("^/apps/brussel/CO7/(.+)/modules/(20[12][0-9][ab])/all/")
-
-        if toolchainver == nil then return end
-
-	local cutoff = string.format("%da", os.date("%Y") - 2)
-
-        if parseVersion(toolchainver) < parseVersion(cutoff) then
+    if frameStk:atTop() then
+        if old_module_check(t) then
 	    LmodWarning{msg="sisc_deprecated_module", fullName=t.modFullName, tcver_cutoff=cutoff}
         end
     end
@@ -216,12 +224,7 @@ local function visible_hook(modT)
     -- modT is a table with: fullName, sn, fn and isVisible
     -- The latter is a boolean to determine if a module is visible or not
 
-    local tcver = modT.fn:match("^/apps/brussel/.*/modules/(20[0-9][0-9][ab])/all/")
-    if tcver == nil then return end
-
-    -- always the the a version of two years ago
-    local cutoff = string.format("%da", os.date("%Y") - 2)
-    if parseVersion(tcver) < parseVersion(cutoff) then
+    if old_module_check(modT) then
         modT.isVisible = false
     end
 end
