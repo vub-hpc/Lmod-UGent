@@ -79,10 +79,8 @@ local function load_hook(t)
     logmsg(logTbl)
 
     -- warn users about old modules (only directly loaded ones)
-    if frameStk:atTop() then
-        if old_module_check(t) then
-	    LmodWarning{msg="sisc_deprecated_module", fullName=t.modFullName, tcver_cutoff=cutoff}
-        end
+    if frameStk:atTop() and old_module_check(t) then
+        LmodWarning{msg="sisc_deprecated_module", fullName=t.modFullName, tcver_cutoff=cutoff}
     end
 end
 
