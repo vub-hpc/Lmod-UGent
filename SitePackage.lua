@@ -223,7 +223,9 @@ local function visible_hook(modT)
     -- modT is a table with: fullName, sn, fn and isVisible
     -- The latter is a boolean to determine if a module is visible or not
 
-    if old_module_check(modT) then
+    if modT.fullName:find("cluster/%.") then
+        modT.isVisible = false
+    else if old_module_check(modT) then
         modT.isVisible = false
     end
 end

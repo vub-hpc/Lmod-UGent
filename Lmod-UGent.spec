@@ -1,7 +1,7 @@
 %global macrosdir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 
 Name:           Lmod
-Version:        8.2.2
+Version:        8.2.8
 Release:        2.br%{?dist}
 Summary:        Environmental Modules System in Lua
 
@@ -14,7 +14,6 @@ Source2:        SitePackage.lua
 Source3:        run_lmod_cache.py
 Source4:        admin.list
 Source5:        lang.lua
-Patch0:         Lmod-spider-no-hidden-cluster-modules.patch
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 BuildArch:      noarch
@@ -41,7 +40,6 @@ where the library and header files can be found.
 
 %prep
 %setup -q
-%patch0 -p1
 sed -i -e 's,/usr/bin/env ,/usr/bin/,' src/*.tcl
 # Remove bundled lua-term
 rm -r pkgs/luafilesystem/ pkgs/term/ tools/json.lua
