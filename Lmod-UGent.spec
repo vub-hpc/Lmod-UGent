@@ -1,8 +1,8 @@
 %global macrosdir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 
 Name:           Lmod
-Version:        8.2.2
-Release:        2.br%{?dist}
+Version:        8.2.8
+Release:        1.br%{?dist}
 Summary:        Environmental Modules System in Lua
 
 # Lmod-5.3.2/tools/base64.lua is LGPLv2
@@ -14,14 +14,15 @@ Source2:        SitePackage.lua
 Source3:        run_lmod_cache.py
 Source4:        admin.list
 Source5:        lang.lua
-Patch0:         Lmod-spider-no-hidden-cluster-modules.patch
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
-BuildArch:      noarch
+# Lmod 8.x ships binaries when configured with --with-fastTCLInterp=yes (which is the default)
+# BuildArch:      noarch
 BuildRequires:  lua-filesystem
 BuildRequires:  lua-json
 BuildRequires:  lua-posix
 BuildRequires:  lua-term
+BuildRequires:  tcl-devel
 Requires:       lua-filesystem
 Requires:       lua-json
 Requires:       lua-posix
@@ -41,7 +42,6 @@ where the library and header files can be found.
 
 %prep
 %setup -q
-%patch0 -p1
 sed -i -e 's,/usr/bin/env ,/usr/bin/,' src/*.tcl
 # Remove bundled lua-term
 rm -r pkgs/luafilesystem/ pkgs/term/ tools/json.lua
@@ -54,7 +54,7 @@ sed -i -e '/^#!/d' init/*.in
 %configure --prefix=%{_datadir} PS=/bin/ps --with-caseIndependentSorting=yes --with-redirect=yes --with-autoSwap=no \
 --with-disableNameAutoSwap=yes --with-shortTime=86400 --with-pinVersions=yes --with-cachedLoads=no \
 --with-siteName=HPC-SISC --with-syshost=Hydra --with-siteMsgFile=%{_datadir}/lmod/etc/lang.lua \
---with-fastTCLInterp=no --with-extendedDefault=no
+--with-extendedDefault=no
 make %{?_smp_mflags}
 
 
@@ -96,6 +96,11 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Tue Dec 03 2019 Ward Poelmans <ward.poelmans@vub.be>
+- Bump to 8.2.8 from upstream
+- Drop patch for hiding cluster modules. It's now done with a hook
+- Use the binary tcl interpreter. This makes the rpm binary instead of noarch.
+
 * Thu Aug 08 2019 Ward Poelmans <ward.poelmans@vub.be>
 - Switch to upstream 8.1.13
 
