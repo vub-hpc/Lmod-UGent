@@ -225,7 +225,7 @@ local function visible_hook(modT)
 
     if modT.fullName:find("cluster/%.") then
         modT.isVisible = false
-    else if old_module_check(modT) then
+    elseif old_module_check(modT) then
         modT.isVisible = false
     end
 end
