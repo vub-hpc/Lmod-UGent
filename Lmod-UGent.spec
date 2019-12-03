@@ -2,7 +2,7 @@
 
 Name:           Lmod
 Version:        8.2.8
-Release:        2.br%{?dist}
+Release:        1.br%{?dist}
 Summary:        Environmental Modules System in Lua
 
 # Lmod-5.3.2/tools/base64.lua is LGPLv2
@@ -16,11 +16,13 @@ Source4:        admin.list
 Source5:        lang.lua
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
-BuildArch:      noarch
+# Lmod 8.x ships binaries when configured with --with-fastTCLInterp=yes (which is the default)
+# BuildArch:      noarch
 BuildRequires:  lua-filesystem
 BuildRequires:  lua-json
 BuildRequires:  lua-posix
 BuildRequires:  lua-term
+BuildRequires:  tcl-devel
 Requires:       lua-filesystem
 Requires:       lua-json
 Requires:       lua-posix
@@ -52,7 +54,7 @@ sed -i -e '/^#!/d' init/*.in
 %configure --prefix=%{_datadir} PS=/bin/ps --with-caseIndependentSorting=yes --with-redirect=yes --with-autoSwap=no \
 --with-disableNameAutoSwap=yes --with-shortTime=86400 --with-pinVersions=yes --with-cachedLoads=no \
 --with-siteName=HPC-SISC --with-syshost=Hydra --with-siteMsgFile=%{_datadir}/lmod/etc/lang.lua \
---with-fastTCLInterp=no --with-extendedDefault=no
+--with-extendedDefault=no
 make %{?_smp_mflags}
 
 
@@ -94,6 +96,11 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Tue Dec 03 2019 Ward Poelmans <ward.poelmans@vub.be>
+- Bump to 8.2.8 from upstream
+- Drop patch for hiding cluster modules. It's now done with a hook
+- Use the binary tcl interpreter. This makes the rpm binary instead of noarch.
+
 * Thu Aug 08 2019 Ward Poelmans <ward.poelmans@vub.be>
 - Switch to upstream 8.1.13
 
