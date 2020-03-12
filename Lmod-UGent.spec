@@ -1,7 +1,7 @@
 %global macrosdir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 
 Name:           Lmod
-Version:        8.2.8
+Version:        8.3.5
 Release:        1.br%{?dist}
 Summary:        Environmental Modules System in Lua
 
@@ -18,17 +18,18 @@ Source5:        lang.lua
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 # Lmod 8.x ships binaries when configured with --with-fastTCLInterp=yes (which is the default)
 # BuildArch:      noarch
+BuildRequires:  gcc
 BuildRequires:  lua-filesystem
 BuildRequires:  lua-json
 BuildRequires:  lua-posix
 BuildRequires:  lua-term
+BuildRequires:  lua-devel
 BuildRequires:  tcl-devel
 Requires:       lua-filesystem
 Requires:       lua-json
 Requires:       lua-posix
 Requires:       lua-term
-Requires:       tcl
-Requires:       /bin/ps
+Requires:       /usr/bin/ps
 Conflicts:      environment-modules
 
 %description
@@ -96,6 +97,10 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Thu Mar 12 2020 Ward Poelmans <ward.poelmans@vub.be>
+- Changed dependencies to match reallity
+- bump to 8.3.5
+
 * Tue Dec 03 2019 Ward Poelmans <ward.poelmans@vub.be>
 - Bump to 8.2.8 from upstream
 - Drop patch for hiding cluster modules. It's now done with a hook
