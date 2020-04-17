@@ -170,12 +170,12 @@ local function errwarnmsg_hook(kind, key, msg, t)
         local sname = t.sn
         local frameStk = FrameStk:singleton()
 
-        local errmsg = {"A different version of the '"..sname.."' module is already loaded (see output of 'ml')."}
+        local errmsg = {"A different version of the '" .. sname .. "' module is already loaded (see output of 'ml')."}
         if not frameStk:empty() then
             local framesn = frameStk:sn()
-            errmsg[#errmsg+1] = [[You should load another '"..framesn.."' module for that is compatible with
-the currently loaded version of '"..sname.."'."]]
-            errmsg[#errmsg+1] = "Use 'ml spider "..framesn.."' to get an overview of the available versions."
+            errmsg[#errmsg+1] = "You should load another '" .. framesn .. "' module for that is compatible with" ..
+                                "the currently loaded version of '" .. sname .. "'."
+            errmsg[#errmsg+1] = "Use 'ml spider " .. framesn .. "' to get an overview of the available versions."
         end
         errmsg[#errmsg+1] = "\n"
 
