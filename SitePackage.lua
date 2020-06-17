@@ -230,6 +230,28 @@ local function visible_hook(modT)
     end
 end
 
+
+local function get_avail_memory()
+    -- If in a job, return the maximum allowed memory, else nil
+    if os.getenv("PBS_JOBID") == nil then
+        return nil
+    end
+
+    -- To do: make this general, read /proc/self/cgroup to know the cgroup
+    local memory_limit = "/sys/fs/cgroup/memory/torque/" .. os.getenv("PBS_JOBID") .. "/memory.memsw.limit_in_bytes"
+    local memory_file = io.open(memory_limit, "r")
+
+    if not memory_file then
+        return nil
+    end
+
+    local memory_value = memory_file:read()
+    memory_file:close()
+
+    return memory_value
+end
+
+
 hook.register("load", load_hook)
 -- Needs more testing before enabling:
 -- hook.register("restore", restore_hook)
@@ -239,3 +261,8 @@ hook.register("SiteName", site_name_hook)
 hook.register("packagebasename", packagebasename)
 hook.register("errWarnMsgHook", errwarnmsg_hook)
 hook.register("isVisibleHook", visible_hook)
+
+sandbox_registration{
+    get_avail_memory = get_avail_memory,
+    math = { floor = math.floor },
+}

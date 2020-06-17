@@ -1,7 +1,7 @@
 %global macrosdir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 
 Name:           Lmod
-Version:        8.3.8
+Version:        8.3.15
 Release:        1.br%{?dist}
 Summary:        Environmental Modules System in Lua
 
@@ -97,6 +97,11 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Wed Jun 17 2020 Ward Poelmans <ward.poelmans@vub.be>
+- Added get_avail_memory function to module sandbox
+- Add math.floor to sandbox
+- bump to 8.3.15
+
 * Thu Mar 12 2020 Ward Poelmans <ward.poelmans@vub.be>
 - Changed dependencies to match reallity
 - bump to 8.3.5
