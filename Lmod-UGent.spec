@@ -1,7 +1,7 @@
 %global macrosdir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 
 Name:           Lmod
-Version:        8.3.15
+Version:        8.3.17
 Release:        1.br%{?dist}
 Summary:        Environmental Modules System in Lua
 
