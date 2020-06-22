@@ -255,7 +255,7 @@ local function get_avail_memory()
         return nil
     end
 
-    local memory_value = memory_file:read()
+    local memory_value = tonumber(memory_file:read())
     memory_file:close()
 
     -- if the value is 2^63-1 (rounded down to multiples of 4096), it's unlimited
