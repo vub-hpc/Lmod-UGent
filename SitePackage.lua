@@ -10,6 +10,7 @@ require("cmdfuncs")
 require("utils")
 require("lmod_system_execute")
 require("parseVersion")
+require("string_utils")
 local Dbg   = require("Dbg")
 local dbg   = Dbg:dbg()
 local hook  = require("Hook")
@@ -232,14 +233,23 @@ end
 
 
 local function get_avail_memory()
-    -- If in a job, return the maximum allowed memory, else nil
-    if os.getenv("PBS_JOBID") == nil then
+    -- If a limit is set, return the maximum allowed memory, else nil
+
+    -- look for the memory cgroup (if any)
+    local cgroup = nil
+    for line in io.lines("/proc/self/cgroup") do
+        cgroup = line:match("^[0-9]+:memory:(.*)$")
+        if cgroup then
+            break
+        end
+    end
+
+    if not cgroup then
         return nil
     end
 
-    -- To do: make this general, read /proc/self/cgroup to know the cgroup
-    local memory_limit = "/sys/fs/cgroup/memory/torque/" .. os.getenv("PBS_JOBID") .. "/memory.memsw.limit_in_bytes"
-    local memory_file = io.open(memory_limit, "r")
+    -- read of the current maximum allowed memory usage (memory + swap)
+    local memory_file = io.open("/sys/fs/cgroup/memory/" .. cgroup .. "/memory.memsw.limit_in_bytes")
 
     if not memory_file then
         return nil
@@ -247,6 +257,11 @@ local function get_avail_memory()
 
     local memory_value = memory_file:read()
     memory_file:close()
+
+    -- if the value is 2^63-1 (rounded down to multiples of 4096), it's unlimited
+    if memory_value == 9223372036854771712 then
+        return nil
+    end
 
     return memory_value
 end
@@ -264,5 +279,4 @@ hook.register("isVisibleHook", visible_hook)
 
 sandbox_registration{
     get_avail_memory = get_avail_memory,
-    math = { floor = math.floor },
 }
