@@ -278,4 +278,10 @@ hook.register("isVisibleHook", visible_hook)
 
 sandbox_registration{
     get_avail_memory = get_avail_memory,
+    math = {
+        floor = math.floor,
+        ceil = math.ceil,
+        max = math.max,
+        min = math.min,
+    },
 }
