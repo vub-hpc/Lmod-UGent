@@ -23,7 +23,7 @@ local function logmsg(logTbl)
     -- logTbl[#logTbl+1] = {'log_key', 'log_value'}
 
     local cluster = os.getenv("VSC_INSTITUTE_CLUSTER") or ""
-    local jobid = os.getenv("PBS_JOBID") or ""
+    local jobid = os.getenv("PBS_JOBID") or os.getenv("SLURM_JOB_ID") or ""
     local user = os.getenv("USER")
     local arch = os.getenv("VSC_ARCH_LOCAL") or ""
 
@@ -142,7 +142,7 @@ local function msg_hook(mode, output)
     dbg.print{"Mode is ", mode, "\n"}
 
     if mode == "avail" then
-        output[#output+1] = "\nIf you need software that is not listed, request it at hpc@vub.ac.be\n"
+        output[#output+1] = "\nIf you need software that is not listed, request it at hpc@vub.be\n"
     end
 
     dbg.fini()
@@ -207,7 +207,7 @@ end
 local function site_name_hook()
     -- set the SiteName, it must be a valid
     -- shell variable name.
-    return "HPC_SISC"
+    return "VUB_HPC"
 end
 
 
@@ -224,6 +224,8 @@ local function visible_hook(modT)
     -- The latter is a boolean to determine if a module is visible or not
 
     if modT.fullName:find("cluster/%.") then
+        modT.isVisible = false
+    elseif modT.fullName:find("EESSI/%.") then
         modT.isVisible = false
     elseif old_module_check(modT) then
         modT.isVisible = false
