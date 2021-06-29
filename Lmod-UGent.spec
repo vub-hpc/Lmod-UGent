@@ -2,7 +2,7 @@
 
 Name:           Lmod
 Version:        8.5.7
-Release:        1.br%{?dist}
+Release:        2.br%{?dist}
 Summary:        Environmental Modules System in Lua
 
 # Lmod-5.3.2/tools/base64.lua is LGPLv2
@@ -54,7 +54,8 @@ sed -i -e '/^#!/d' init/*.in
 %build
 %configure --prefix=%{_datadir} PS=/bin/ps --with-caseIndependentSorting=yes --with-redirect=yes --with-autoSwap=no \
 --with-disableNameAutoSwap=yes --with-shortTime=86400 --with-pinVersions=yes --with-cachedLoads=no \
---with-siteName=HPC-SISC --with-syshost=Hydra --with-siteMsgFile=%{_datadir}/lmod/etc/lang.lua \
+--with-siteName=VUB_HPC \
+--with-siteMsgFile=%{_datadir}/lmod/etc/lang.lua \
 --with-extendedDefault=no
 make %{?_smp_mflags}
 
