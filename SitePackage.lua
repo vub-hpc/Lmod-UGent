@@ -44,7 +44,7 @@ end
 local function old_module_check(modT)
     -- Check if a module is 'old'
     -- modT should have a entry 'fn' with the module path
-    -- returns true/false
+    -- returns 4 values: true/false, cutoff1, true/false, cutoff2
 
     local tcver = modT.fn:match("^/apps/brussel/.*/modules/(20[0-9][0-9][ab])/all/")
     if tcver == nil then return end
@@ -53,15 +53,17 @@ local function old_module_check(modT)
     local year = tonumber(os.date("%Y"))
     local month = tonumber(os.date("%m"))
 
+    -- cutoff1 is 2.5 year, cutoff2 is 3.5 year
     local cutoff_year = year - 3
     local suffix = "b"
     if (month > 6) then
         cutoff_year = year - 2
         suffix = "a"
     end
-    local cutoff = string.format("%d%s", cutoff_year, suffix)
+    local cutoff1 = string.format("%d%s", cutoff_year, suffix)
+    local cutoff2 = string.format("%d%s", cutoff_year - 1, suffix)
 
-    return parseVersion(tcver) < parseVersion(cutoff)
+    return parseVersion(tcver) < parseVersion(cutoff1), cutoff1, parseVersion(tcver) < parseVersion(cutoff2), cutoff2
 end
 
 
@@ -87,10 +89,14 @@ local function load_hook(t)
 
     logmsg(logTbl)
 
-    -- inform users about old modules (only directly loaded ones)
-    if frameStk:atTop() and old_module_check(t) then
-        local cutoff = string.format("%da", os.date("%Y") - 2)
-        LmodMessage{msg="vub_deprecated_module", fullName=t.modFullName, tcver_cutoff=cutoff}
+    -- inform/warn users about old modules (only directly loaded ones)
+    local old1, cutoff1, old2, cutoff2 = old_module_check(t)
+    if frameStk:atTop() then
+        if old2 then
+            LmodWarning{msg="vub_very_old_module", fullName=t.modFullName, tcver_cutoff=cutoff2}
+        elseif old1 then
+            LmodMessage{msg="vub_old_module", fullName=t.modFullName, tcver_cutoff=cutoff1}
+        end
     end
 end
 
