@@ -49,8 +49,17 @@ local function old_module_check(modT)
     local tcver = modT.fn:match("^/apps/brussel/.*/modules/(20[0-9][0-9][ab])/all/")
     if tcver == nil then return end
 
-    -- always the the a version of two years ago
-    local cutoff = string.format("%da", os.date("%Y") - 2)
+    -- always the the a version of three years ago
+    local year = tonumber(os.date("%Y"))
+    local month = tonumber(os.date("%m"))
+
+    local cutoff_year = year - 3
+    local suffix = "b"
+    if (month > 6) then
+        cutoff_year = year - 2
+        suffix = "a"
+    end
+    local cutoff = string.format("%d%s", cutoff_year, suffix)
 
     return parseVersion(tcver) < parseVersion(cutoff)
 end
@@ -78,10 +87,10 @@ local function load_hook(t)
 
     logmsg(logTbl)
 
-    -- warn users about old modules (only directly loaded ones)
+    -- inform users about old modules (only directly loaded ones)
     if frameStk:atTop() and old_module_check(t) then
         local cutoff = string.format("%da", os.date("%Y") - 2)
-        LmodWarning{msg="sisc_deprecated_module", fullName=t.modFullName, tcver_cutoff=cutoff}
+        LmodMessage{msg="vub_deprecated_module", fullName=t.modFullName, tcver_cutoff=cutoff}
     end
 end
 
