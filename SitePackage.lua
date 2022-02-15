@@ -49,7 +49,6 @@ local function old_module_check(modT)
     local tcver = modT.fn:match("^/apps/brussel/.*/modules/(20[0-9][0-9][ab])/all/")
     if tcver == nil then return end
 
-    -- always the the a version of three years ago
     local year = tonumber(os.date("%Y"))
     local month = tonumber(os.date("%m"))
 
