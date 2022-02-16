@@ -41,39 +41,10 @@ local function logmsg(logTbl)
 end
 
 
-local function calc_cutoff(timestamp)
-    -- calculate the cutoff toolchain generation from a timestamp
-    -- returns 2 values :
-    -- 1) cutoff timestamp
-    -- 2) cutoff toolchain generation (string): year+suffix (e.g. 2022a)
-
-    local year = tonumber(os.date("%Y", timestamp))
-    local month = tonumber(os.date("%m", timestamp))
-    local suffix
-    local cutoffmonth
-
-    if (month > 6) then
-        suffix = "b"
-        cutoffmonth = 7
-    else
-        suffix = "a"
-        cutoffmonth = 1
-    end
-
-    local cutoffstamp = os.time({year=year, month=cutoffmonth, day=1})
-
-    return cutoffstamp, year .. suffix
-end
-
-
-local function old_module_check(modT)
-    -- Check if a module is older than cutoff date 1 and/or cutoff date 2
+local function module_age(modT)
+    -- Calculate the age of a module, relative to the current toolchain generation
     -- modT should have a entry 'fn' with the module path
-    -- returns 4 values:
-    -- 1) is it older than cutoff1? (boolean)
-    -- 2) tc_cutoff1 (string): toolchain generation of cutoff1
-    -- 3) is it older than cutoff2? (boolean)
-    -- 4) tc_cutoff2 (string): toolchain generation of cutoff1
+    -- returns age (in months) between module toolchain generation and current toolchain generation
 
     local tcver = modT.fn:match("^/apps/brussel/.*/modules/(20[0-9][0-9][ab])/all/")
     if tcver == nil then return end
@@ -85,12 +56,8 @@ local function old_module_check(modT)
     local tcmonth = suffixmonth[tcsuffix]
     local tcstamp = os.time({year=tcyear, month=tcmonth, day=1})
 
-    local ts = os.time()
-    -- cutoff1 is 2.5 year, cutoff2 is 3.5 year
-    local cutoff1stamp, tc_cutoff1 = calc_cutoff(ts - math.floor(2.5 * 31556926))
-    local cutoff2stamp, tc_cutoff2 = calc_cutoff(ts - math.floor(3.5 * 31556926))
-
-    return tcstamp < cutoff1stamp, tc_cutoff1, tcstamp < cutoff2stamp, tc_cutoff2
+    -- 1 month is 2629743 seconds
+    return math.floor((os.time() - tcstamp) / (6 * 2629743))
 end
 
 
@@ -117,12 +84,12 @@ local function load_hook(t)
     logmsg(logTbl)
 
     -- inform/warn users about old modules (only directly loaded ones)
-    local old1, cutoff1, old2, cutoff2 = old_module_check(t)
+    local age = module_age(t)
     if frameStk:atTop() then
-        if old2 then
-            LmodWarning{msg="vub_very_old_module", fullName=t.modFullName, tcver_cutoff=cutoff2}
-        elseif old1 then
-            LmodMessage{msg="vub_old_module", fullName=t.modFullName, tcver_cutoff=cutoff1}
+        if age > 7 then
+            LmodWarning{msg="vub_very_old_module", fullName=t.modFullName}
+        elseif age > 5 then
+            LmodMessage{msg="vub_old_module", fullName=t.modFullName}
         end
     end
 end
@@ -269,7 +236,7 @@ local function visible_hook(modT)
         modT.isVisible = false
     elseif modT.fullName:find("EESSI/") then
         modT.isVisible = false
-    elseif old_module_check(modT) then
+    elseif module_age(modT) > 5 then
         modT.isVisible = false
     end
 end
