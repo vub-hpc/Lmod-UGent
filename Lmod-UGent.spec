@@ -2,7 +2,7 @@
 
 Name:           Lmod
 Version:        8.5.7
-Release:        2.br%{?dist}
+Release:        3.br%{?dist}
 Summary:        Environmental Modules System in Lua
 
 # Lmod-5.3.2/tools/base64.lua is LGPLv2
@@ -98,6 +98,11 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Tue Feb 15 2022 Samuel Moors <samuel.moors@vub.be>
+- use lmodmessage rather than warning for old modules
+- increase cutoff to 2.5 years, update every 6 months
+- add second cutoff at 3.5 years with warning
+
 * Wed Jun 17 2020 Ward Poelmans <ward.poelmans@vub.be>
 - Added get_avail_memory function to module sandbox
 - Add math.floor to sandbox
