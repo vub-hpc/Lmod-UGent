@@ -41,28 +41,56 @@ local function logmsg(logTbl)
 end
 
 
+local function calc_cutoff(timestamp)
+    -- calculate the cutoff toolchain generation from a timestamp
+    -- returns 2 values :
+    -- 1) cutoff timestamp
+    -- 2) cutoff toolchain generation (string): year+suffix (e.g. 2022a)
+
+    local year = tonumber(os.date("%Y", timestamp))
+    local month = tonumber(os.date("%m", timestamp))
+    local suffix
+    local cutoffmonth
+
+    if (month > 6) then
+        suffix = "b"
+        cutoffmonth = 7
+    else
+        suffix = "a"
+        cutoffmonth = 1
+    end
+
+    local cutoffstamp = os.time({year=year, month=cutoffmonth, day=1})
+
+    return cutoffstamp, year .. suffix
+end
+
+
 local function old_module_check(modT)
-    -- Check if a module is 'old'
+    -- Check if a module is older than cutoff date 1 and/or cutoff date 2
     -- modT should have a entry 'fn' with the module path
-    -- returns 4 values: true/false, cutoff1, true/false, cutoff2
+    -- returns 4 values:
+    -- 1) is it older than cutoff1? (boolean)
+    -- 2) tc_cutoff1 (string): toolchain generation of cutoff1
+    -- 3) is it older than cutoff2? (boolean)
+    -- 4) tc_cutoff2 (string): toolchain generation of cutoff1
 
     local tcver = modT.fn:match("^/apps/brussel/.*/modules/(20[0-9][0-9][ab])/all/")
     if tcver == nil then return end
 
-    local year = tonumber(os.date("%Y"))
-    local month = tonumber(os.date("%m"))
+    local suffixmonth = {a=1, b=7}
 
+    local tcyear = string.sub(tcver, 1, 4)
+    local tcsuffix = string.sub(tcver, 5, 5)
+    local tcmonth = suffixmonth[tcsuffix]
+    local tcstamp = os.time({year=tcyear, month=tcmonth, day=1})
+
+    local ts = os.time()
     -- cutoff1 is 2.5 year, cutoff2 is 3.5 year
-    local cutoff_year = year - 3
-    local suffix = "b"
-    if (month > 6) then
-        cutoff_year = year - 2
-        suffix = "a"
-    end
-    local cutoff1 = string.format("%d%s", cutoff_year, suffix)
-    local cutoff2 = string.format("%d%s", cutoff_year - 1, suffix)
+    local cutoff1stamp, tc_cutoff1 = calc_cutoff(ts - math.floor(2.5 * 31556926))
+    local cutoff2stamp, tc_cutoff2 = calc_cutoff(ts - math.floor(3.5 * 31556926))
 
-    return parseVersion(tcver) < parseVersion(cutoff1), cutoff1, parseVersion(tcver) < parseVersion(cutoff2), cutoff2
+    return tcstamp < cutoff1stamp, tc_cutoff1, tcstamp < cutoff2stamp, tc_cutoff2
 end
 
 
