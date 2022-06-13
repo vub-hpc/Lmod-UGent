@@ -2,7 +2,7 @@
 -- The SitePackage customization for UGent-HPC & VUB-HPC
 -- Ward Poelmans <ward.poelmans@ugent.be>
 -- Kenneth Hoste <kenneth.hoste@ugent.be>
--- Ward Poelmans <ward.poelmans@vub.ac.be>
+-- Ward Poelmans <ward.poelmans@vub.be>
 --------------------------------------------------------------------------
 
 require("strict")
@@ -190,7 +190,7 @@ local function errwarnmsg_hook(kind, key, msg, t)
     end
 
     if kind == "lmoderror" or kind == "lmodwarning" then
-        msg = msg .. "\nIf you don't understand the warning or error, contact the helpdesk at hpc@vub.ac.be"
+        msg = msg .. "\nIf you don't understand the warning or error, contact the helpdesk at hpc@vub.be"
     end
 
     -- log any errors users get
