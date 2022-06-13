@@ -2,7 +2,7 @@
 
 Name:           Lmod
 Version:        8.5.7
-Release:        3.br%{?dist}
+Release:        4.br%{?dist}
 Summary:        Environmental Modules System in Lua
 
 # Lmod-5.3.2/tools/base64.lua is LGPLv2
@@ -98,6 +98,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Mon Jun 13 2022 Samuel Moors <samuel.moors@vub.be>
+- Fix HPC email
+
 * Tue Feb 15 2022 Samuel Moors <samuel.moors@vub.be>
 - use lmodmessage rather than warning for old modules
 - increase cutoff to 2.5 years, update every 6 months
