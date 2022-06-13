@@ -1,5 +1,5 @@
 -- Custom strings for VUB-HPC
--- Ward Poelmans <ward.poelmans@vub.ac.be>
+-- Ward Poelmans <ward.poelmans@vub.be>
 
 return {
    en = {
