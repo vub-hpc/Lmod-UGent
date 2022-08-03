@@ -256,7 +256,10 @@ local function get_avail_memory()
         return nil
     end
 
-    -- read of the current maximum allowed memory usage (memory + swap)
+    -- Slurm tasks are only limited by the job step that launched it
+    cgroup = cgroup:gsub("/task_[%d]+$", "")
+
+    -- read the current maximum allowed memory usage (memory + swap)
     local memory_file = io.open("/sys/fs/cgroup/memory/" .. cgroup .. "/memory.memsw.limit_in_bytes")
 
     if not memory_file then
