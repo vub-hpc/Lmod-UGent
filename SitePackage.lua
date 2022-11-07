@@ -234,6 +234,8 @@ local function visible_hook(modT)
         modT.isVisible = false
     elseif modT.fullName:find("EESSI/") then
         modT.isVisible = false
+    elseif modT.fullName:find("JupyterHub/") then
+        modT.isVisible = false
     elseif module_age(modT) > 5 then
         modT.isVisible = false
     end
