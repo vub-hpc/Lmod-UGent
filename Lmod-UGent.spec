@@ -2,7 +2,7 @@
 
 Name:           Lmod
 Version:        8.7.6
-Release:        1.br%{?dist}
+Release:        2.br%{?dist}
 Summary:        Environmental Modules System in Lua
 
 # Lmod-5.3.2/tools/base64.lua is LGPLv2
@@ -98,6 +98,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Mon Nov 07 2022 Alex Domingo <alex.domingo.toro@vub.be>
+- Hide JupyterHub modules
+
 * Mon Jun 13 2022 Samuel Moors <samuel.moors@vub.be>
 - Fix HPC email
 
