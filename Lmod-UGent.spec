@@ -2,7 +2,7 @@
 
 Name:           Lmod
 Version:        8.7.6
-Release:        2.br%{?dist}
+Release:        3.br%{?dist}
 Summary:        Environmental Modules System in Lua
 
 # Lmod-5.3.2/tools/base64.lua is LGPLv2
@@ -56,7 +56,8 @@ sed -i -e '/^#!/d' init/*.in
 --with-disableNameAutoSwap=yes --with-shortTime=86400 --with-pinVersions=yes --with-cachedLoads=no \
 --with-siteName=VUB_HPC \
 --with-siteMsgFile=%{_datadir}/lmod/etc/lang.lua \
---with-extendedDefault=no
+--with-extendedDefault=no \
+--with-cachedLoads=yes
 make %{?_smp_mflags}
 
 
@@ -98,6 +99,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Fri Jan 20 2023 Samuel Moors <samuel.moors@vub.be>
+- turn on cached loads
+
 * Mon Nov 07 2022 Alex Domingo <alex.domingo.toro@vub.be>
 - Hide JupyterHub modules
 
