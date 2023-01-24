@@ -2,7 +2,7 @@
 
 Name:           Lmod
 Version:        8.7.6
-Release:        3.br%{?dist}
+Release:        4.br%{?dist}
 Summary:        Environmental Modules System in Lua
 
 # Lmod-5.3.2/tools/base64.lua is LGPLv2
@@ -52,8 +52,13 @@ sed -i -e '/^#!/d' init/*.in
 
 
 %build
-%configure --prefix=%{_datadir} PS=/bin/ps --with-caseIndependentSorting=yes --with-redirect=yes --with-autoSwap=no \
---with-disableNameAutoSwap=yes --with-shortTime=86400 --with-pinVersions=yes --with-cachedLoads=no \
+%configure --prefix=%{_datadir} PS=/bin/ps \
+--with-caseIndependentSorting=yes \
+--with-redirect=yes \
+--with-autoSwap=no \
+--with-disableNameAutoSwap=yes \
+--with-shortTime=86400 \
+--with-pinVersions=yes \
 --with-siteName=VUB_HPC \
 --with-siteMsgFile=%{_datadir}/lmod/etc/lang.lua \
 --with-extendedDefault=no \
@@ -99,6 +104,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Tue Jan 24 2023 Samuel Moors <samuel.moors@vub.be>
+- fix cached loads config
+
 * Fri Jan 20 2023 Samuel Moors <samuel.moors@vub.be>
 - turn on cached loads
 
