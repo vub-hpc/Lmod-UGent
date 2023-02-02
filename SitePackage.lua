@@ -31,7 +31,7 @@ local function logmsg(logTbl)
                               user, cluster, arch, jobid)
 
     for _, val in ipairs(logTbl) do
-        msg = msg .. string.format(", %s=%s", val[1], val[2] or "")
+        msg = msg .. string.format(", %s=%q", val[1], val[2] or "")
     end
 
     -- Don't log any modules load by the monitoring
