@@ -2,7 +2,7 @@
 
 Name:           Lmod
 Version:        8.7.19
-Release:        1.br%{?dist}
+Release:        2.br%{?dist}
 Summary:        Environmental Modules System in Lua
 
 # Lmod-5.3.2/tools/base64.lua is LGPLv2
@@ -83,7 +83,7 @@ install -Dpm 644 %{SOURCE1} %{buildroot}/%{macrosdir}/macros.%{name}
 # Override SitePackage.lua
 install -Dpm 644 %{SOURCE2} %{buildroot}%{_datadir}/lmod/%{version}/libexec
 # install icinga/nagios wrapper for the cache creation
-install -Dpm 755 %{SOURCE3} %{buildroot}%{_datadir}/lmod/%{version}/libexec
+#install -Dpm 755 %{SOURCE3} %{buildroot}%{_datadir}/lmod/%{version}/libexec
 # install admin.list
 mkdir -p %{buildroot}%{_datadir}/lmod/etc
 install -Dpm 644 %{SOURCE4} %{buildroot}%{_datadir}/lmod/etc
@@ -104,6 +104,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Mon Feb 20 2023 Ward Poelmans <ward.poelmans@vub.be>
+- No longer install run_lmod_cache.py as it comes from Lmod-config
+
 * Tue Jan 24 2023 Samuel Moors <samuel.moors@vub.be>
 - fix cached loads config
 
