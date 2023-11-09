@@ -2,7 +2,7 @@
 
 Name:           Lmod
 Version:        8.7.19
-Release:        2.br%{?dist}
+Release:        3.br%{?dist}
 Summary:        Environmental Modules System in Lua
 
 # Lmod-5.3.2/tools/base64.lua is LGPLv2
@@ -104,6 +104,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Thu Nov 09 2023 Alex Domingo <alex.domingo.toro@vub.be>
+- Hide AlphaFold modules for ColabFold
+
 * Mon Feb 20 2023 Ward Poelmans <ward.poelmans@vub.be>
 - No longer install run_lmod_cache.py as it comes from Lmod-config
 
